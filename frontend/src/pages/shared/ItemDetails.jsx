@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
-import { getItemById } from '../../services/items.service';
+import { getItemById, deleteItem } from '../../services/items.service';
 import { createClaim } from '../../services/firestore.service';
 import { useAuth } from '../../context/AuthContext';
 import {
     Calendar, MapPin, Tag, User,
     MessageCircle, Shield, ArrowLeft,
-    CheckCircle, Clock, AlertTriangle, Send, Package
+    CheckCircle, Clock, AlertTriangle, Send, Package, Trash2
 } from 'lucide-react';
 
 const ItemDetails = () => {
@@ -35,6 +35,18 @@ const ItemDetails = () => {
         };
         loadItem();
     }, [id, navigate]);
+
+    const handleDelete = async () => {
+        if (window.confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
+            try {
+                await deleteItem(id);
+                navigate('/student/dashboard');
+            } catch (err) {
+                console.error('Failed to delete:', err);
+                alert('Failed to delete item');
+            }
+        }
+    };
 
     const handleClaim = async (e) => {
         e.preventDefault();
@@ -106,7 +118,7 @@ const ItemDetails = () => {
                         <div className="grid grid-cols-2 gap-8">
                             {[
                                 { icon: <MapPin className="text-blue-600" />, label: 'Location', value: item.location },
-                                { icon: <Calendar className="text-amber-500" />, label: 'Reported Date', value: item.date },
+                                { icon: <Calendar className="text-amber-500" />, label: 'Reported Date', value: item.createdAt?.toDate ? new Date(item.createdAt.toDate()).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Pending' },
                                 { icon: <Tag className="text-emerald-500" />, label: 'Category', value: item.category },
                                 { icon: <User className="text-indigo-500" />, label: 'Color Detail', value: item.color }
                             ].map((detail, idx) => (
@@ -153,6 +165,18 @@ const ItemDetails = () => {
                                     <p className="text-center text-xs text-slate-400 font-medium px-4">
                                         By clicking this, you assert ownership of this item. Faculty will verify your claim.
                                     </p>
+                                </div>
+                            )}
+
+                            {/* Owner Actions */}
+                            {user.uid === item.reportedBy?.uid && (
+                                <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                                    <button
+                                        onClick={handleDelete}
+                                        className="w-full py-4 rounded-xl border-2 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all font-bold uppercase tracking-widest flex items-center justify-center gap-2"
+                                    >
+                                        <Trash2 size={18} /> Delete Report
+                                    </button>
                                 </div>
                             )}
 

@@ -169,12 +169,33 @@ const ReportWizard = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="label">Last Time Seen</label>
-                                    <input
-                                        type="datetime-local"
-                                        className="input w-full"
-                                        value={formData.lastTimeSeen}
-                                        onChange={e => setFormData(p => ({ ...p, lastTimeSeen: e.target.value }))}
-                                    />
+                                    <div className="flex gap-4">
+                                        <div className="flex-1">
+                                            <input
+                                                type="date"
+                                                className="input w-full"
+                                                value={formData.lastTimeSeen ? formData.lastTimeSeen.split('T')[0] : ''}
+                                                max={new Date().toISOString().split('T')[0]}
+                                                onChange={e => {
+                                                    const date = e.target.value;
+                                                    const time = formData.lastTimeSeen ? formData.lastTimeSeen.split('T')[1] : '12:00';
+                                                    setFormData(p => ({ ...p, lastTimeSeen: `${date}T${time}` }));
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="w-1/3">
+                                            <input
+                                                type="time"
+                                                className="input w-full"
+                                                value={formData.lastTimeSeen ? formData.lastTimeSeen.split('T')[1] : ''}
+                                                onChange={e => {
+                                                    const time = e.target.value;
+                                                    const date = formData.lastTimeSeen ? formData.lastTimeSeen.split('T')[0] : new Date().toISOString().split('T')[0];
+                                                    setFormData(p => ({ ...p, lastTimeSeen: `${date}T${time}` }));
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
                                     <p className="text-[10px] text-slate-500 font-medium">When did you last see this item?</p>
                                 </div>
                                 <div className="space-y-2">

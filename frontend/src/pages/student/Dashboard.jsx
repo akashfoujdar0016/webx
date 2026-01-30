@@ -46,6 +46,14 @@ const StudentDashboard = () => {
                 setMyReports(userReports);
                 setRecentItems(othersItems);
 
+                console.log('DEBUG DASHBOARD:', {
+                    currentUser: user?.uid,
+                    firstItemReporter: allItems[0]?.reportedBy,
+                    isMatch: allItems[0]?.reportedBy?.uid === user?.uid,
+                    allItemsCount: allItems.length,
+                    userReportsCount: userReports.length
+                });
+
                 // Check for matches
                 const recommendations = await getMatchRecommendations(2);
                 setMatches(recommendations);
@@ -186,15 +194,17 @@ const StudentDashboard = () => {
                                             </div>
                                             <div className="p-4">
                                                 <h5 className="font-bold text-sm mb-1 truncate text-white">{item.title}</h5>
-                                                <p className="text-xs text-white/40 flex items-center gap-1 truncate">
+                                                <p className="text-xs text-white/40 flex items-center gap-1 truncate mb-2">
                                                     <Search size={12} className="text-cyan-400 flex-shrink-0" /> {item.location}
                                                 </p>
-                                                <p className="text-xs text-white/30 flex items-center gap-1 mt-1">
-                                                    <Clock size={12} className="flex-shrink-0" /> {item.createdAt?.toDate ? new Date(item.createdAt.toDate()).toLocaleDateString() : 'Recently'}
-                                                </p>
+                                                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/30 border-t border-white/5 pt-2">
+                                                    <span>{item.createdAt?.toDate ? new Date(item.createdAt.toDate()).toLocaleDateString() : 'Recently'}</span>
+                                                    <span className="text-cyan-400/80">You</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    ))}
+                                    ))
+                                    }
                                 </div>
                             )}
                         </div>
@@ -232,12 +242,13 @@ const StudentDashboard = () => {
                                         </div>
                                         <div className="p-4">
                                             <h5 className="font-bold text-sm mb-1 truncate text-white">{item.title}</h5>
-                                            <p className="text-xs text-white/40 flex items-center gap-1 truncate">
+                                            <p className="text-xs text-white/40 flex items-center gap-1 truncate mb-2">
                                                 <Search size={12} className="text-cyan-400 flex-shrink-0" /> {item.location}
                                             </p>
-                                            <p className="text-xs text-white/30 flex items-center gap-1 mt-1">
-                                                <Clock size={12} className="flex-shrink-0" /> By {item.reportedBy?.name || 'User'}
-                                            </p>
+                                            <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/30 border-t border-white/5 pt-2">
+                                                <span>{item.createdAt?.toDate ? new Date(item.createdAt.toDate()).toLocaleDateString() : 'Recently'}</span>
+                                                <span className="text-cyan-400/80">By {item.reportedBy?.name || 'User'}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -278,7 +289,7 @@ const StudentDashboard = () => {
                     </div>
                 </div>
             </div>
-        </Layout>
+        </Layout >
     );
 };
 
