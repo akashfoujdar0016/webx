@@ -150,8 +150,8 @@ const VerifyQueue = () => {
                                         key={claim.id}
                                         onClick={() => setSelectedClaim(claim)}
                                         className={`glass-card p-6 cursor-pointer transition-all border-2 ${selectedClaim?.id === claim.id
-                                                ? 'border-blue-600 bg-blue-50/20 dark:bg-blue-600/5'
-                                                : 'border-transparent hover:border-blue-300'
+                                            ? 'border-blue-600 bg-blue-50/20 dark:bg-blue-600/5'
+                                            : 'border-transparent hover:border-blue-300'
                                             }`}
                                     >
                                         <div className="flex items-center justify-between">
@@ -167,8 +167,8 @@ const VerifyQueue = () => {
                                                         <div className="h-1.5 w-24 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                                                             <div
                                                                 className={`h-full ${trustScore >= 75 ? 'bg-emerald-500' :
-                                                                        trustScore >= 50 ? 'bg-amber-500' :
-                                                                            'bg-red-500'
+                                                                    trustScore >= 50 ? 'bg-amber-500' :
+                                                                        'bg-red-500'
                                                                     }`}
                                                                 style={{ width: `${trustScore}%` }}
                                                             ></div>
@@ -213,7 +213,17 @@ const VerifyQueue = () => {
                                         <div className="flex justify-between items-start mb-6">
                                             <div>
                                                 <h3 className="text-2xl font-black uppercase tracking-tight">Review Claim</h3>
-                                                <p className="text-[10px] font-black text-slate-500 tracking-widest">
+                                                <div className="flex items-center gap-4 mt-2 mb-1">
+                                                    <div className="flex items-center gap-2 group cursor-pointer" onClick={() => navigator.clipboard.writeText(selectedClaim.id)} title="Copy Claim ID">
+                                                        <span className="text-[10px] font-black text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">CLAIM: {selectedClaim.id}</span>
+                                                    </div>
+                                                    {selectedClaim.itemId && (
+                                                        <div className="flex items-center gap-2 group cursor-pointer" onClick={() => navigator.clipboard.writeText(selectedClaim.itemId)} title="Copy Report ID">
+                                                            <span className="text-[10px] font-black text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">ITEM: {selectedClaim.itemId}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <p className="text-[10px] font-black text-slate-500 tracking-widest mt-1">
                                                     SUBMITTED {formatDate(selectedClaim.createdAt)}
                                                 </p>
                                             </div>

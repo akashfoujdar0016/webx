@@ -119,6 +119,21 @@ const ItemDetails = () => {
                         </div>
 
                         <div className="pt-8 border-t border-slate-200 dark:border-slate-800">
+                            {/* Security UX: Report ID */}
+                            <div className="mb-6 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-between group">
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Report ID (Security Reference)</p>
+                                    <code className="text-sm font-mono font-bold text-slate-600 dark:text-slate-300 select-all">{item.id}</code>
+                                </div>
+                                <button
+                                    onClick={() => navigator.clipboard.writeText(item.id)}
+                                    className="p-2 text-slate-400 hover:text-blue-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                    title="Copy Report ID"
+                                >
+                                    <span className="text-xs font-bold uppercase">Copy</span>
+                                </button>
+                            </div>
+
                             {user.role === 'student' && item.status === 'open' && (
                                 <button
                                     onClick={() => setShowClaimModal(true)}
