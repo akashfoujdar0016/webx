@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '../../components/layout/Layout';
 import { getItems } from '../../services/items.service';
+import { getMatchRecommendations } from '../../services/matching.service';
 import { FileText, Zap, Shield, Search, ArrowRight, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -16,6 +17,7 @@ const StudentDashboard = () => {
         { label: 'Total Items', value: '0', icon: <Search size={20} />, color: 'purple' },
         { label: 'Active', value: '0', icon: <Zap size={20} />, color: 'pink' },
     ]);
+    const [matches, setMatches] = useState([]);
     const [recentItems, setRecentItems] = useState([]);
     const [myReports, setMyReports] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -43,6 +45,10 @@ const StudentDashboard = () => {
 
                 setMyReports(userReports);
                 setRecentItems(othersItems);
+
+                // Check for matches
+                const recommendations = await getMatchRecommendations(2);
+                setMatches(recommendations);
 
                 // Calculate stats
                 setStats([
@@ -96,6 +102,28 @@ const StudentDashboard = () => {
                         Refresh Data
                     </button>
                 </div>
+
+                {/* Auto-Match Banner */}
+                {matches.length > 0 && (
+                    <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-2xl p-6 flex items-center justify-between gap-6 animate-pulse-slow">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-amber-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                                <Zap size={24} fill="currentColor" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black uppercase tracking-tight text-amber-500">
+                                    {matches.length} Possible {matches.length === 1 ? 'Match' : 'Matches'} Found
+                                </h3>
+                                <p className="text-slate-400 font-medium text-sm">
+                                    We found items that similar to your lost report for <span className="text-white font-bold">"{matches[0].lostItem.title}"</span>.
+                                </p>
+                            </div>
+                        </div>
+                        <Link to={`/student/items/${matches[0].foundItem.id}`} className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:shadow-amber-500/20 whitespace-nowrap">
+                            View Match
+                        </Link>
+                    </div>
+                )}
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
