@@ -212,7 +212,7 @@ const StudentDashboard = () => {
                         {/* Recent Opportunities */}
                         <div>
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">Recent Opportunities</h3>
+                                <h3 className="text-xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">Recent Activities</h3>
                                 <Link to="/student/search" className="text-cyan-400 font-bold text-sm flex items-center gap-2 hover:gap-3 transition-all hover:text-cyan-300">
                                     View All <ArrowRight size={16} />
                                 </Link>

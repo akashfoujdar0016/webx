@@ -23,7 +23,33 @@ const VerifyQueue = () => {
         setIsLoading(true);
         try {
             const data = await getPendingClaims();
-            setClaims(data);
+
+            // Enrich claims with claimant and item details
+            const results = await Promise.all(data.map(async (claim) => {
+                try {
+                    const [profile, item] = await Promise.all([
+                        getUserProfile(claim.claimantId),
+                        getItemById(claim.itemId)
+                    ]);
+
+                    // If item doesn't exist (deleted), skip this claim
+                    if (!item) return null;
+
+                    return {
+                        ...claim,
+                        claimantName: profile?.name || 'Unknown',
+                        claimantEmail: profile?.email,
+                        itemTitle: item?.title || 'Unknown Item'
+                    };
+                } catch (e) {
+                    console.error('Error enriching claim:', e);
+                    return null;
+                }
+            }));
+
+            // Filter out nulls (orphaned claims)
+            const enrichedData = results.filter(c => c !== null);
+            setClaims(enrichedData);
         } catch (err) {
             console.error('Error loading claims:', err);
         } finally {
@@ -156,29 +182,19 @@ const VerifyQueue = () => {
                                     >
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-4 flex-1">
-                                                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-black text-lg">
-                                                    {claim.id.substring(0, 2).toUpperCase()}
+                                                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg shadow-blue-500/20">
+                                                    {claim.claimantName ? claim.claimantName.charAt(0).toUpperCase() : '?'}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h4 className="font-extrabold text-sm uppercase tracking-tight mb-1 truncate">
-                                                        Claim Request
+                                                    <h4 className="font-extrabold text-sm uppercase tracking-tight mb-0.5 truncate text-slate-900 dark:text-white">
+                                                        {claim.itemTitle}
                                                     </h4>
-                                                    <div className="flex items-center gap-3 mb-2">
-                                                        <div className="h-1.5 w-24 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                                                            <div
-                                                                className={`h-full ${trustScore >= 75 ? 'bg-emerald-500' :
-                                                                    trustScore >= 50 ? 'bg-amber-500' :
-                                                                        'bg-red-500'
-                                                                    }`}
-                                                                style={{ width: `${trustScore}%` }}
-                                                            ></div>
-                                                        </div>
-                                                        <span className="text-[10px] font-black tracking-widest text-slate-400">
-                                                            CONFIDENCE: {trustScore}%
-                                                        </span>
-                                                    </div>
-                                                    <p className="text-[10px] text-slate-500 font-bold">
-                                                        {formatDate(claim.createdAt)}
+                                                    <p className="text-xs font-bold text-blue-600 mb-2 flex items-center gap-1">
+                                                        <User size={12} /> {claim.claimantName || 'Unknown User'}
+                                                    </p>
+
+                                                    <p className="text-[10px] text-slate-500 font-bold flex items-center gap-1">
+                                                        <Calendar size={10} /> {formatDate(claim.createdAt)}
                                                     </p>
                                                 </div>
                                             </div>
@@ -282,11 +298,17 @@ const VerifyQueue = () => {
                                                 <div className="glass-card p-4">
                                                     <div className="flex items-center gap-4 mb-3">
                                                         {claimItem.images && claimItem.images.length > 0 ? (
-                                                            <img
-                                                                src={claimItem.images[0]}
-                                                                alt={claimItem.title}
-                                                                className="w-16 h-16 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
-                                                            />
+                                                            <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                                                                {claimItem.images.map((img, idx) => (
+                                                                    <img
+                                                                        key={idx}
+                                                                        src={img}
+                                                                        alt={`${claimItem.title} ${idx + 1}`}
+                                                                        className="w-24 h-24 rounded-xl object-cover border border-slate-200 dark:border-slate-700 hover:scale-105 transition-transform cursor-pointer"
+                                                                        onClick={() => window.open(img, '_blank')}
+                                                                    />
+                                                                ))}
+                                                            </div>
                                                         ) : (
                                                             <div className="w-16 h-16 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                                                                 <Package size={24} className="text-slate-400" />
