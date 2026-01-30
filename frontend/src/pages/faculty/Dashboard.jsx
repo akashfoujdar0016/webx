@@ -443,7 +443,7 @@ const FacultyDashboard = () => {
                     </div>
                 </div>
             </div>
-        </Layout >
+        </Layout>
     );
 };
 
