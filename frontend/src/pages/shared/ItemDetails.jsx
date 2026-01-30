@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
-import { api } from '../../services/api';
+import { getItemById } from '../../services/items.service';
+import { createClaim } from '../../services/firestore.service';
 import { useAuth } from '../../context/AuthContext';
 import {
     Calendar, MapPin, Tag, User,
@@ -22,7 +23,7 @@ const ItemDetails = () => {
     useEffect(() => {
         const loadItem = async () => {
             try {
-                const data = await api.getItemById(id);
+                const data = await getItemById(id);
                 if (!data) return navigate(-1);
                 setItem(data);
             } catch (err) {
@@ -39,14 +40,14 @@ const ItemDetails = () => {
         e.preventDefault();
         setIsClaiming(true);
         try {
-            await api.createClaim(id, {
-                claimantId: user.id,
+            await createClaim(id, {
+                claimantId: user.uid,
                 message: claimMessage,
                 trustScore: 75
             });
             setShowClaimModal(false);
             // Refresh item to show claimed status
-            const updated = await api.getItemById(id);
+            const updated = await getItemById(id);
             setItem(updated);
         } catch (err) {
             console.error(err);
@@ -134,13 +135,25 @@ const ItemDetails = () => {
                                 </button>
                             </div>
 
-                            {user.role === 'student' && item.status === 'open' && (
-                                <button
-                                    onClick={() => setShowClaimModal(true)}
-                                    className="btn btn-primary w-full py-5 text-lg font-black uppercase tracking-widest shadow-2xl shadow-blue-500/20"
-                                >
-                                    Initiate Claim Request
-                                </button>
+                            {user.role === 'student' && (item.status === 'open' || item.status === 'active') && (
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-emerald-500 font-bold text-xs uppercase tracking-widest px-1">
+                                        <CheckCircle size={14} />
+                                        <span>Available for Claim</span>
+                                    </div>
+                                    <button
+                                        onClick={() => setShowClaimModal(true)}
+                                        className="w-full py-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-2xl shadow-emerald-500/30 border border-emerald-400/20 group transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+                                    >
+                                        <div className="flex items-center justify-center gap-3">
+                                            <Shield size={24} className="group-hover:rotate-12 transition-transform" />
+                                            <span className="text-lg font-black uppercase tracking-widest">Initiate Claim Request</span>
+                                        </div>
+                                    </button>
+                                    <p className="text-center text-xs text-slate-400 font-medium px-4">
+                                        By clicking this, you assert ownership of this item. Faculty will verify your claim.
+                                    </p>
+                                </div>
                             )}
 
                             {item.status !== 'open' && (
