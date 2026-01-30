@@ -51,8 +51,10 @@ export const Layout = ({ children }) => {
                         <Shield size={24} />
                     </div>
                     <div>
-                        <span className="block font-black text-xl tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-white">GLA PORTAL</span>
-
+                        <span className="block font-black text-xl tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-white">L&F Portal</span>
+                        <span className="block text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">
+                            {user?.role === 'faculty' ? 'Faculty Corner' : 'Student Corner'}
+                        </span>
                     </div>
                 </div>
 
@@ -98,7 +100,7 @@ export const Layout = ({ children }) => {
 
             {/* Mobile Nav Top Bar */}
             <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/5 backdrop-blur-lg border-b border-white/10 px-6 flex items-center justify-between z-40">
-                <div className="font-black text-sm uppercase tracking-widest text-cyan-400">GLA PORTAL</div>
+                <div className="font-black text-sm uppercase tracking-widest text-cyan-400">L&F Portal</div>
                 <div className="flex items-center gap-4">
                     <button onClick={() => setIsSidebarOpen(true)} className="p-2 bg-white/5 rounded-xl text-white">
                         <Menu size={24} />
